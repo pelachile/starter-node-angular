@@ -15,15 +15,15 @@ function main() {
 function installPM2() {
   return ssh.execCommand(
     'sudo npm install pm2 -g', {
-      cwd: '/home/ubuntu'
+      cwd: '/home/ubuntu/www'
   });
 }
 
 // transfers local project to the remote server
 function transferProjectToRemote(failed, successful) {
   return ssh.putDirectory(
-    '../deployment-handson-four',
-    '/home/ubuntu/data/server2/riot-express-todo-list-temp',
+    '../starter-node-angular',
+    '/home/ubuntu/www/starter-node-angular',
     {
       recursive: true,
       concurrency: 1,
@@ -49,8 +49,8 @@ function transferProjectToRemote(failed, successful) {
 // creates a temporary folder on the remote server
 function createRemoteTempFolder() {
   return ssh.execCommand(
-    'rm -rf riot-express-todo-list-temp && mkdir riot-express-todo-list-temp', {
-      cwd: '/home/ubuntu/data/server2'
+    'rm -rf starter-node-angular-temp && mkdir starter-node-angular-temp', {
+      cwd: '/home/ubuntu/www'
   });
 }
 
@@ -58,23 +58,23 @@ function createRemoteTempFolder() {
 function stopRemoteServices() {
   return ssh.execCommand(
     'pm2 stop all && sudo service mongod stop', {
-      cwd: '/home/ubuntu/data/server2'
+      cwd: '/home/ubuntu/www'
   });
 }
 
 // updates the project source on the server
 function updateRemoteApp() {
   return ssh.execCommand(
-    'cp -r riot-express-todo-list-temp/* /home/ubuntu/data/server2/riot/ && rm -rf riot-express-todo-list-temp', {
-      cwd: '/home/ubuntu/data/server2'
+    'cp -r starter-node-angular-temp/* /home/ubuntu/www/starter-node-angular && rm -rf starter-node-angular-temp', {
+      cwd: '/home/ubuntu/www'
   });
 }
 
 // restart mongodb and node services on the remote server
 function restartRemoteServices() {
   return ssh.execCommand(
-    'cd /home/ubuntu/data/server2/riot && sudo service mongod start && pm2 start app.js', {
-      cwd: '/home/ubuntu/server2'
+    'cd /home/ubuntu/www/starter-node-angular && sudo service mongod start && pm2 start app.js', {
+      cwd: '/home/ubuntu/www'
   });
 }
 
@@ -95,7 +95,7 @@ function sshConnect() {
       return installPM2();
     })
     .then(function() {
-      console.log('Creating `riot-express-todo-list-temp` folder.');
+      console.log('Creating `starter-node-angular-temp` folder.');
       return createRemoteTempFolder();
     })
     .then(function(result) {
